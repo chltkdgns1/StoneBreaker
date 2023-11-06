@@ -8,10 +8,11 @@ public class PickAction : MonoBehaviour
 {
     Sequence mySequence = null;
 
-    Vector3 down = new Vector3(-120f, 0f, 0f);
-    Vector3 up = new Vector3(120f, 0f, 0f);
+    Vector3 down = new Vector3(0, 0f, 60f);
+    Vector3 up = new Vector3(0f, 0f, 0f);
 
-    float duringTime = 1f;
+    float upTime = 0.5f;
+    float downTime = 0.3f;
 
     int damage = 1;
     int accuracy = 100;
@@ -37,10 +38,10 @@ public class PickAction : MonoBehaviour
         }
 
         mySequence = DOTween.Sequence();
-        mySequence.Append(transform.DORotate(down, duringTime)).OnComplete(() =>
+        mySequence.Append(transform.DOLocalRotate(down, downTime)).OnComplete(() =>
         {
             handler.OnFinishPick(damage, accuracy);
             // 데미지 입힌다.
-        }).Append(transform.DORotate(up, duringTime));
+        }).Append(transform.DOLocalRotate(up, upTime)).SetLoops(-1);
     }
 }

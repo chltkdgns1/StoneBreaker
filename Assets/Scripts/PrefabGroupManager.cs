@@ -27,9 +27,9 @@ public class PrefabGroupManager : MonoBehaviour
             return; 
         }
 
-        if(poolSize == 0)
+        if(initPoolSize == 0)
         {
-            Debug.LogError("poolSize is zeror");
+            Debug.LogError("initPoolSize is zeror");
             return;
         }
 

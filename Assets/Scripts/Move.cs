@@ -47,6 +47,11 @@ public class Move : MonoBehaviour
         ResetMoveState();
     }
 
+    public Vector3 GetXZ(Vector3 pos)
+    {
+        return new Vector3(pos.x, 0, pos.z);
+    }
+
     protected virtual void FixedUpdate()
     {
         if (isPosMove == false && isDirMove == false)
@@ -54,10 +59,9 @@ public class Move : MonoBehaviour
 
         if (isPosMove)
         {
-            Vector3 dir = (targetMove - transform.position);
+            Vector3 dir = (targetMove - GetXZ(transform.position));
             var nextMovePos = dir.normalized * speed * Time.deltaTime;
             SetMove(nextMovePos);
-            //charController.Move(nextMovePos);
 
             if (IsFinishPosMove())
             {
@@ -65,22 +69,7 @@ public class Move : MonoBehaviour
                 targetMove = Vector3.zero;
                 distance = 1e9f;
                 eventHandler?.OnMoveFinish();
-            }
-        }
-
-        if (isDirMove)
-        {
-            var nextMovePos = dirMove * Time.deltaTime * speed;
-            SetMove(nextMovePos);
-            //charController.Move(nextMovePos);
-
-            if (IsFinishDirMove())
-            {
-                ResetMoveState();
-                dirMove = Vector3.zero;
-                startPos = Vector3.zero;
-                limitDistance = 10f;
-                eventHandler?.OnMoveFinish();
+                return;
             }
         }
     }
@@ -98,7 +87,7 @@ public class Move : MonoBehaviour
         if (isPosMove == false)
             return true;
 
-        float dis = Vector3.Distance(targetMove, transform.position);
+        float dis = Vector3.Distance(targetMove, GetXZ(transform.position));
         if (distance > dis && dis > 0.001f)
         {
             distance = dis;
@@ -107,29 +96,14 @@ public class Move : MonoBehaviour
         return true;
     }
 
-    protected virtual bool IsFinishDirMove()
-    {
-        if (isDirMove == false)
-            return true;
-
-        float distance = Vector3.Distance(startPos, transform.position);
-        return distance >= limitDistance;
-    }
-
-    public virtual void MovePos(Vector3 pos)
+    public virtual void MovePos(Transform pos, float diff = 0f)
     {
         isPosMove = true;
         isDirMove = false;
-        targetMove = pos + transform.position;
-        distance = 1e9f;
-    }
 
-    public virtual void MoveDir(Vector3 dir, float limitDistance = 10f)
-    {
-        isPosMove = false;
-        isDirMove = true;
-        dirMove = dir;
-        startPos = transform.position;
-        this.limitDistance = limitDistance;
+        transform.LookAt(pos);
+        var dir = (GetXZ(transform.position) - GetXZ(pos.position)).normalized;
+        targetMove = dir * diff + GetXZ(pos.position);
+        distance = 1e9f;
     }
 }

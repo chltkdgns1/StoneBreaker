@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PickGroupManager : PrefabGroupManager
 {
-    public void ActivePick(Vector3 target, float diff)
+    public void ActivePick(Transform target, float diff)
     {
         var ob = GetNextCreate();
         if (ob == null)
@@ -13,6 +13,7 @@ public class PickGroupManager : PrefabGroupManager
             return;
         }
 
+        ob.SetActive(true);
         var pickController = ob.GetComponent<PickController>();
         pickController.SetMove(target, diff);
     }
