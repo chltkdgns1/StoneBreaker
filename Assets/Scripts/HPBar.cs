@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class HPBar : MonoBehaviour
 {
-    PrefabGroupManager damageTxtGroup;
-
     [SerializeField]
     Image hpBarImg;
 
@@ -27,21 +25,10 @@ public class HPBar : MonoBehaviour
         maxHp = hp;
     }
 
-    public void SetDamage(int damage, DamageState state)
+    public void SetDamage(DamageData data)
     {
-        remainHp -= damage;
+        remainHp -= data.damage;
         hpTxt.text = Utility.GetCommaNumberString(remainHp);
         hpBarImg.fillAmount = (float)remainHp / maxHp;
-
-        var damageTxt = damageTxtGroup.GetNext();
-
-        var damTxt = damageTxt.GetComponent<DamageTxt>();
-
-        if (state == DamageState.DIE)
-            damTxt.SetDamage("DIE");
-        else if (state == DamageState.MISS)
-            damTxt.SetDamage("MISS");
-        else
-            damTxt.SetDamage(Utility.GetCommaNumberString(damage));
     }
 }

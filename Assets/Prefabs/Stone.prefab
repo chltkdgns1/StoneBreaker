@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6158758075816103666}
   - component: {fileID: -2370594414776468153}
   m_Layer: 0
-  m_Name: TestStone
+  m_Name: Stone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -111,4 +111,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb45cc7bca47ebb4d910615a71db97e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rad: 0
+  damageTxtGroup: {fileID: 0}
+  rad: 1.25

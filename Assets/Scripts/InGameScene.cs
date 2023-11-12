@@ -16,6 +16,9 @@ public class InGameScene : MonoBehaviour,
     [SerializeField]
     UIInGameScene uIInGameScene;
 
+    [SerializeField]
+    UIRelationInGameScene uIRelationInGameScene;
+
     public static InGameScene instance = null;
 
     private void Awake()
@@ -27,11 +30,9 @@ public class InGameScene : MonoBehaviour,
             Destroy(gameObject);
             return;
         }
-    }
 
-    void Start()
-    {
         uIInGameScene.SetHandler(this);
+        uIRelationInGameScene.SetDamageTargetTxt(stoneController.transform);
     }
 
     public void AddPick(int cnt)
@@ -44,7 +45,8 @@ public class InGameScene : MonoBehaviour,
 
     public void OnFinishPick(int damage, int accuracy)
     {
-        stoneController.SetDamage(damage, accuracy);
+        var damageData = stoneController.SetDamage(damage, accuracy);
+        uIRelationInGameScene.OnDamage(damageData);
     }
 
     public void OnAddPick(int cnt)

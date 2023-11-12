@@ -64,14 +64,6 @@ public class EncryData
             encryList[i].SetData(decryList[i]);
         }
     }
-
-    public static void AllPrint()
-    {
-        foreach (var encryEle in encryList)
-        {
-            Debug.Log(encryEle.GetData<int>() + " , " + keyValue);
-        }
-    }
 }
 
 public class Encry : MonoSingleTon<Encry>
@@ -87,7 +79,6 @@ public class Encry : MonoSingleTon<Encry>
     void ResetAll()
     {
         EncryData.Reset();
-        EncryData.AllPrint();
     }
 
     private void Update()

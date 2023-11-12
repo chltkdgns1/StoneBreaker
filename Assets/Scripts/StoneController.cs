@@ -9,6 +9,17 @@ public enum DamageState
     DIE,
 }
 
+public struct DamageData
+{
+    public DamageState state;
+    public int damage;
+    public DamageData(DamageState state, int damage)
+    {
+        this.state = state;
+        this.damage = damage;
+    }
+}
+
 public class StoneController : MonoBehaviour
 {
     [SerializeField]
@@ -23,7 +34,7 @@ public class StoneController : MonoBehaviour
         return rad;
     }
 
-    public DamageState SetDamage(int damage, int accuracy)
+    public DamageData SetDamage(int damage, int accuracy)
     {
         damage -= shield;
         accuracy -= miss;
@@ -36,14 +47,14 @@ public class StoneController : MonoBehaviour
         if(accuracy < 100)
         {
             int range = Random.Range(0, 100) + 1;
-            if(accuracy < range)
-                return DamageState.MISS;
+            if (accuracy < range)
+                return new DamageData(DamageState.MISS , 0);
         }
         
         stoneHp -= damage;
         if (stoneHp <= 0)
-            return DamageState.DIE;
+            return new DamageData(DamageState.DIE, damage);
 
-        return DamageState.SUCCESS;
+        return new DamageData(DamageState.SUCCESS, damage);
     }
 }

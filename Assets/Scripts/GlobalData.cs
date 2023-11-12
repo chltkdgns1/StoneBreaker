@@ -5,18 +5,10 @@ using UnityEngine;
 
 public class GlobalData
 {
-    static GlobalData instance = new GlobalData();
-
-    GlobalData()
-    {
-
-    }
-
+    public static EncryData money = null;
     public static void Init()
     {
         Encry.Instance.Starting();
-
-        var encry = new EncryData(3.ToString());
-        Debug.Log(encry.GetData<int>());
+        money = new EncryData(100000000.ToString());
     }
 }

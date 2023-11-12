@@ -40,7 +40,7 @@ public class PrefabGroupManager : MonoBehaviour
         AddPoolSize(initPoolSize);
     }
 
-    void AddPoolSize(int size)
+    public virtual void AddPoolSize(int size)
     {
         poolSize += size;
 
