@@ -16,44 +16,33 @@ public class InGameScene : MonoBehaviour,
     [SerializeField]
     UIInGameScene uIInGameScene;
 
-    [SerializeField]
-    UIRelationInGameScene uIRelationInGameScene;
-
-    public static InGameScene instance = null;
-
     private void Awake()
     {
-        if (instance == null)
-            instance = this;
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
-
         uIInGameScene.SetHandler(this);
-        uIRelationInGameScene.SetDamageTargetTxt(stoneController.transform);
     }
 
     public void AddPick(int cnt)
     {
         for(int i = 0; i < cnt; i++)
         {
-            pickGroup.ActivePick(stoneController.transform, stoneController.GetRad());
+            pickGroup.ActivePick(stoneController.transform, stoneController.GetRad(), this);
         }
     }
 
     public void OnFinishPick(int damage, int accuracy)
     {
-        var damageData = stoneController.SetDamage(damage, accuracy);
-        uIRelationInGameScene.OnDamage(damageData);
+        var damageData = stoneController.GetDamage(damage, accuracy);
+        DamageTxtGroupManager.instance.OnDamageTxt(damageData, stoneController.transform);
+        long money = GlobalData.money.GetData<long>() + damageData.damage;
+        GlobalData.money.SetData(money.ToString());
+        uIInGameScene.SetMoneyTxt();
     }
 
     public void OnAddPick(int cnt)
     {
         for(int i = 0; i < cnt; i++)
         {
-            pickGroup.ActivePick(stoneController.transform, stoneController.GetRad());
+            pickGroup.ActivePick(stoneController.transform, stoneController.GetRad(), this);
         }
     }
 }

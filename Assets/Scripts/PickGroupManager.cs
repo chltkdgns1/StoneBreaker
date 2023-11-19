@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PickGroupManager : PrefabGroupManager
 {
-    public void ActivePick(Transform target, float diff)
+    public void ActivePick(Transform target, float diff, PickAction.EventHandler handler)
     {
         var ob = GetNextCreate();
         if (ob == null)
@@ -16,6 +16,7 @@ public class PickGroupManager : PrefabGroupManager
         ob.SetActive(true);
         var pickController = ob.GetComponent<PickController>();
         pickController.SetMove(target, diff);
+        pickController.SetActionHander(handler);
     }
 
     public List<GameObject> GetPickList()

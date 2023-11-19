@@ -4,22 +4,32 @@ using UnityEngine;
 
 public class DamageTxtGroupManager : PrefabGroupManager
 {
-    private Transform damageTarget;
+    public static DamageTxtGroupManager instance = null;
 
-    public void OnDamageTxt(DamageData data)
+    protected override void Awake()
     {
-        var damageTxt = GetNext().GetComponent<DamageTxt>();
+        if (instance == null)
+            instance = this;
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
 
-        damageTxt.transform.position = damageTarget.position;
+        base.Awake();
+    }
+
+    public void OnDamageTxt(DamageData data, Transform target)
+    {
+        var ob = GetNext();
+        ob.transform.position = Camera.main.WorldToScreenPoint(target.position);
+        ob.SetActive(true);
+
+        var damageTxt = ob.GetComponent<DamageTxt>();
 
         if (data.state != DamageState.SUCCESS)
             damageTxt.SetDamage(data.state.ToString());
         else
             damageTxt.SetDamage(Utility.GetCommaNumberString(data.damage));
-    }
-
-    public void SetTarget(Transform target)
-    {
-        damageTarget = target;
     }
 }

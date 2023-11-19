@@ -11,6 +11,7 @@ public class Utility : MonoBehaviour
     static public string GetCommaNumberString(long number)
     {
         stringBuilder.Clear();
+        stringReverse.Clear();
         int cnt = 0;
         while(number > 0)
         {

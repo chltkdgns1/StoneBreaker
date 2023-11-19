@@ -50,4 +50,9 @@ public class PickController : MonoBehaviour, Move.EventHandler
     {
         return pickAction;
     }
+
+    public void SetActionHander(PickAction.EventHandler handler)
+    {
+        pickAction.SetHandler(handler);
+    }
 }

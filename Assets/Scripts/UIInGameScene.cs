@@ -17,6 +17,11 @@ public class UIInGameScene : MonoBehaviour
 
     private void Start()
     {
+        SetMoneyTxt();
+    }
+
+    public void SetMoneyTxt()
+    {
         money.text = Utility.GetCommaNumberString(GlobalData.money.GetData<long>());
     }
 

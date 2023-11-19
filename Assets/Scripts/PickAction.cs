@@ -26,6 +26,9 @@ public class PickAction : MonoBehaviour
 
     public void SetHandler(EventHandler handler)
     {
+        if (this.handler != null)
+            return;
+
         this.handler = handler;
     }
 
@@ -38,10 +41,10 @@ public class PickAction : MonoBehaviour
         }
 
         mySequence = DOTween.Sequence();
-        mySequence.Append(transform.DOLocalRotate(down, downTime)).OnComplete(() =>
+        mySequence.Append(transform.DOLocalRotate(down, downTime)).AppendCallback(() =>
         {
             handler.OnFinishPick(damage, accuracy);
-            // µ¥¹ÌÁö ÀÔÈù´Ù.
+            // ë°ë¯¸ì§€ ì…íŒë‹¤.
         }).Append(transform.DOLocalRotate(up, upTime)).SetLoops(-1);
     }
 }

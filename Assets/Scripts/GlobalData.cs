@@ -9,6 +9,6 @@ public class GlobalData
     public static void Init()
     {
         Encry.Instance.Starting();
-        money = new EncryData(100000000.ToString());
+        money = new EncryData(0.ToString());
     }
 }

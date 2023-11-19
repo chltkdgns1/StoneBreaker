@@ -25,16 +25,18 @@ public class StoneController : MonoBehaviour
     [SerializeField]
     float rad;
 
-    int stoneHp;
-    int shield;
-    int miss;
+    int stoneHp = 30000000;
+    int shield = 0;
+    int miss = 0;
+
+    DamageData data = new DamageData(DamageState.SUCCESS, 0);
 
     public float GetRad()
     {
         return rad;
     }
 
-    public DamageData SetDamage(int damage, int accuracy)
+    public DamageData GetDamage(int damage, int accuracy)
     {
         damage -= shield;
         accuracy -= miss;
@@ -44,17 +46,25 @@ public class StoneController : MonoBehaviour
         if (accuracy <= 0)
             accuracy = 1;
 
-        if(accuracy < 100)
+        if (accuracy < 100)
         {
             int range = Random.Range(0, 100) + 1;
             if (accuracy < range)
-                return new DamageData(DamageState.MISS , 0);
+            {
+                data.damage = 0;
+                data.state = DamageState.MISS;
+                return data;
+            }
         }
-        
-        stoneHp -= damage;
-        if (stoneHp <= 0)
-            return new DamageData(DamageState.DIE, damage);
 
-        return new DamageData(DamageState.SUCCESS, damage);
+        data.damage = damage;
+        if (stoneHp <= 0)
+        {
+            data.state = DamageState.DIE;
+            return data;
+        }
+
+        data.state = DamageState.SUCCESS;
+        return data;
     }
 }
