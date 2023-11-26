@@ -175,6 +175,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pickAction: {fileID: 8456143313758572928}
+  pickInfo:
+    attackInfo:
+      damage: 1
+      accuracy: 100
 --- !u!114 &8708333195811044595
 MonoBehaviour:
   m_ObjectHideFlags: 0

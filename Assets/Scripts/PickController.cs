@@ -2,18 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PickController : MonoBehaviour, Move.EventHandler
+[System.Serializable]
+public class PickInfo
+{
+    public AttackInfo attackInfo;
+}
+
+public class PickController : MonoBehaviour, 
+    Move.EventHandler, 
+    PickAction.EventHandler
 {
     Move move;
+
     [SerializeField]
     PickAction pickAction;
 
+    [SerializeField]
+    protected PickInfo pickInfo;
+
     float normalRad = 25f;
+
+    public interface EventHandler
+    {
+        void OnFinishPick(AttackInfo attackInfo);
+    }
+
+    EventHandler eventHandler;
 
     private void Awake()
     {
         move = GetComponent<Move>();
         move.SetEventHandler(this);
+
+        pickAction.SetHandler(this);
+
         SetRandomPosition();
     }
 
@@ -29,7 +51,7 @@ public class PickController : MonoBehaviour, Move.EventHandler
         return Random.Range(0, 2) == 0 ? 1 : -1;
     }
 
-    // ¹ÙÀ§ ¹İÁö¸§ ¸¸Å­ diff Ã³¸®¸¦ ÇØ¾ßÇÔ. ±× »óÅÂ¿¡¼­ °î°»ÀÌÁú
+    // ë°”ìœ„ ë°˜ì§€ë¦„ ë§Œí¼ diff ì²˜ë¦¬ë¥¼ í•´ì•¼í•¨. ê·¸ ìƒíƒœì—ì„œ ê³¡ê°±ì´ì§ˆ
     public void SetMove(Transform target, float diff = 0f)
     {
         move.MovePos(target, diff);
@@ -40,7 +62,7 @@ public class PickController : MonoBehaviour, Move.EventHandler
         pickAction.SetPicking();
     }
 
-    // ¹«ºùÀÌ ³¡³ª¸é °î°»ÀÌÁú ½ÃÀÛ
+    // ë¬´ë¹™ì´ ëë‚˜ë©´ ê³¡ê°±ì´ì§ˆ ì‹œì‘
     public void OnMoveFinish()
     {
         SetPicking();
@@ -51,8 +73,13 @@ public class PickController : MonoBehaviour, Move.EventHandler
         return pickAction;
     }
 
-    public void SetActionHander(PickAction.EventHandler handler)
+    public void OnFinishPick()
     {
-        pickAction.SetHandler(handler);
+        eventHandler.OnFinishPick(pickInfo.attackInfo);
+    }
+
+    public void SetHandler(PickController.EventHandler handler)
+    {
+        eventHandler = handler;
     }
 }

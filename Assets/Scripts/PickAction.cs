@@ -14,12 +14,9 @@ public class PickAction : MonoBehaviour
     float upTime = 0.5f;
     float downTime = 0.3f;
 
-    int damage = 1;
-    int accuracy = 100;
-
     public interface EventHandler
     {
-        void OnFinishPick(int damage, int accuracy);
+        void OnFinishPick();
     }
 
     EventHandler handler = null;
@@ -43,7 +40,7 @@ public class PickAction : MonoBehaviour
         mySequence = DOTween.Sequence();
         mySequence.Append(transform.DOLocalRotate(down, downTime)).AppendCallback(() =>
         {
-            handler.OnFinishPick(damage, accuracy);
+            handler.OnFinishPick();
             // 데미지 입힌다.
         }).Append(transform.DOLocalRotate(up, upTime)).SetLoops(-1);
     }

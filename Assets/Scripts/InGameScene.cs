@@ -4,13 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class InGameScene : MonoBehaviour,
-    PickAction.EventHandler,
+    PickController.EventHandler,
     UIInGameScene.EventHandler
 {
     [SerializeField]
     PickGroupManager pickGroup;
 
     [SerializeField]
+    Transform stoneGroup;
+
     StoneController stoneController;
 
     [SerializeField]
@@ -21,20 +23,14 @@ public class InGameScene : MonoBehaviour,
         uIInGameScene.SetHandler(this);
     }
 
-    public void AddPick(int cnt)
+    void Start()
     {
-        for(int i = 0; i < cnt; i++)
-        {
-            pickGroup.ActivePick(stoneController.transform, stoneController.GetRad(), this);
-        }
+        CreateStone();
     }
 
-    public void OnFinishPick(int damage, int accuracy)
+    public void OnFinishPick(AttackInfo attackInfo)
     {
-        var damageData = stoneController.GetDamage(damage, accuracy);
-        DamageTxtGroupManager.instance.OnDamageTxt(damageData, stoneController.transform);
-        long money = GlobalData.money.GetData<long>() + damageData.damage;
-        GlobalData.money.SetData(money.ToString());
+        stoneController.SetDamage(attackInfo);
         uIInGameScene.SetMoneyTxt();
     }
 
@@ -44,5 +40,19 @@ public class InGameScene : MonoBehaviour,
         {
             pickGroup.ActivePick(stoneController.transform, stoneController.GetRad(), this);
         }
+    }
+
+    void CreateStone()
+    {
+        int level = GlobalData.stoneLevel.GetData<int>();
+        if (stoneController != null)
+        {
+            stoneController.SetDead();
+            stoneController = null;
+        }
+
+        var stone = Resources.Load<GameObject>("DirectLink/Prefabs/Stone_" + level.ToString());
+        stoneController = Instantiate(stone, stoneGroup).GetComponent<StoneController>();
+        stoneController.transform.position = new Vector3(0, 1f, 0);
     }
 }
