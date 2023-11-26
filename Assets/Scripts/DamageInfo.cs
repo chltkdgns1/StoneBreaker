@@ -58,6 +58,6 @@ public struct ShieldInfo
 [Serializable]
 public struct AttackInfo
 {
-    public int damage;
-    public int accuracy;
+    public int damage;      // 데미지  
+    public int accuracy;    // 명중률
 }

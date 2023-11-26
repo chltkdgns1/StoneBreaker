@@ -8,6 +8,8 @@ public class GlobalData
     public static EncryData money = null;
     public static EncryData stoneLevel = null;
 
+    public static List<PickInfo> pickList = new List<PickInfo>();
+
     public static void Init()
     {
         Encry.Instance.Starting();

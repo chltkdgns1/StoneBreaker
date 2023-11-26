@@ -4,25 +4,36 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-public class PopupStack : MonoBehaviour
+public class PopupStack : BackKey
 {
     public Action onClose = null;
+    public Action backKeyEvent = null;
 
     #region 팝업 스택 static
-    static Dictionary<GameObject, bool> _dic = new Dictionary<GameObject, bool>();
-    static Dictionary<string, int> _dicStr = new Dictionary<string, int>();
-    static Stack<GameObject> popupStack = new Stack<GameObject>();
+    static Dictionary<GameObject, string> _dic = new Dictionary<GameObject, string>();
+    static Dictionary<string, GameObject> _dicStr = new Dictionary<string, GameObject>();
+    static List<GameObject> popupList = new List<GameObject>();
     static GameObject canvasObject = null;
+    static Dictionary<string, GameObject> _dicPrefabs = new Dictionary<string, GameObject>();
     #endregion
 
-    protected virtual void OnEnable()
+    protected override void OnEnable()
     {
+        gameObject.name = gameObject.name.Replace("(Clone)", "");
+        base.OnEnable();
         AddPopup();
     }
 
-    protected virtual void OnDisable()
+    protected override void OnDisable()
     {
+        base.OnDisable();
         RemovePopup();
+    }
+
+    public override void OnBack()
+    {
+        base.OnBack();
+        gameObject.SetActive(false);
     }
 
     public virtual void AddPopup()
@@ -55,22 +66,48 @@ public class PopupStack : MonoBehaviour
 
         var splitList = popupPath.Split("/");
 
-        Transform popup = canvasObject.transform.Find(splitList[splitList.Length - 1]);
+        string name = splitList[splitList.Length - 1];
+        Transform popup = canvasObject.transform.Find(name);
 
         if (popup == null)
         {
-            GameObject popupPrefabs = Resources.Load<GameObject>(popupPath);
+            GameObject popupPrefabs = null;
+            if (_dicPrefabs.ContainsKey(popupPath) == true)
+                popupPrefabs = _dicPrefabs[popupPath];
+            else
+            {
+                popupPrefabs = Resources.Load<GameObject>(popupPath);
+                _dicPrefabs.Add(popupPath, popupPrefabs);
+            }
+
             popup = Instantiate(popupPrefabs, canvasObject.transform).transform;
-            popup.SetAsLastSibling();
         }
+        popup.gameObject.SetActive(true);
         return popup.GetComponent<T>();
+    }
+
+    static public T CheckShowPopup<T>(string popupPath) where T : MonoBehaviour
+    {
+        if (string.IsNullOrEmpty(popupPath))
+            return null;
+
+        var splitList = popupPath.Split("/");
+        var name = splitList[splitList.Length - 1];
+
+        if (_dicStr.ContainsKey(name))
+            return _dicStr[name].GetComponent<T>();
+
+        return null;
     }
 
     static void AddPopup(GameObject ob)
     {
-        Debug.LogWarning("에드 네임 : " + ob.name);
         ob.transform.SetAsLastSibling();
-        popupStack.Push(ob);
+
+        if (popupList.Contains(ob) == true)
+            popupList.Remove(ob);
+
+        popupList.Add(ob);
         AddDicData(ob);
     }
     // 코드에 이벤트에 의해서 작동하는 경우
@@ -81,74 +118,56 @@ public class PopupStack : MonoBehaviour
     // 뒤로 가기에 의해서 작동하는 경우
     static public bool RemoveBack()
     {
-        if (popupStack.Count == 0) 
+        if (IsEmpty()) 
             return false;
 
-        GameObject ob = popupStack.Pop();
+        GameObject popup = GetLastPopup();
 
-        if (ob == null)
+        if (popup == null)
         {
-            RefreshStack();
+            RefreshPopup();
             return RemoveBack();
         }
 
-        RemoveDicData(ob);
-        ob.GetComponent<PopupStack>()?.onClose?.Invoke();
+        RemoveDicData(popup);
+        popup.GetComponent<PopupStack>()?.onClose?.Invoke();
         return true;
     }
 
-    static void RefreshStack()
+    static GameObject GetLastPopup()
     {
-        List<GameObject> popList = new List<GameObject>();
+        return popupList[popupList.Count - 1];
+    }
 
-        while(popupStack.Count != 0)
-        {
-            var ob = popupStack.Pop();
-            if (ob != null)
-                popList.Add(ob);
-        }
-
-        for(int i = popList.Count -1; i >=0; i--)
-        {
-            popupStack.Push(popList[i]);
-        }
+    static void RefreshPopup()
+    {
+        var last = popupList[popupList.Count - 1];
+        if (last == null)
+            popupList.RemoveAt(popupList.Count - 1);
     }
 
     static void AddDicData(GameObject ob)
     {
-        _dic.Add(ob, true);
+        if (_dic.ContainsKey(ob))
+            _dic[ob] = ob.name;
+        else
+            _dic.Add(ob, ob.name);
 
         if (_dicStr.ContainsKey(ob.name))
-        {
-            _dicStr[ob.name]++;
-        }
+            _dicStr[ob.name] = ob;
         else
-        {
-            _dicStr[ob.name] = 1;
-        }
+            _dicStr.Add(ob.name, ob);
     }
+
     static void RemoveDicData(GameObject ob)
     {
         _dic.Remove(ob);
-
-        if (_dicStr.ContainsKey(ob.name))
-        {
-            _dicStr[ob.name]--;
-            if (_dicStr[ob.name] == 0)
-            {
-                _dicStr.Remove(ob.name);
-            }
-
-            else if (_dicStr[ob.name] < 0)
-            {
-                Debug.LogError("static void RemoveDicData(GameObject ob) < 0");
-                _dicStr.Remove(ob.name);
-            }
-        }
+        _dicStr.Remove(ob.name);
     }
+
     static public void Remove(string popupName)
     {
-        if (popupStack.Count == 0)
+        if (IsEmpty())
         {
             Debug.Log("popup empty");
             return;
@@ -160,22 +179,14 @@ public class PopupStack : MonoBehaviour
             return;
         }
 
-        while (popupStack.Count != 0)
-        {
-            GameObject temp = popupStack.Pop();
-            PopupStack tempStack = temp.GetComponent<PopupStack>();
-            tempStack.onClose?.Invoke();
-
-            RemoveDicData(temp);
-            if (_dicStr.ContainsKey(temp.name) == false)
-            {
-                break;
-            }
-        }
+        var ob = _dicStr[popupName];
+        var popup = ob.GetComponent<PopupStack>();
+        popup.onClose?.Invoke();
+        RemoveDicData(ob);
     }
     static void Remove(GameObject ob)
     {
-        if (popupStack.Count == 0)
+        if (IsEmpty())
         {
             Debug.Log("popup empty");
             return;
@@ -186,19 +197,13 @@ public class PopupStack : MonoBehaviour
             return;
         }
 
-        while (popupStack.Count != 0)
-        {
-            GameObject temp = popupStack.Pop();
-            PopupStack tempStack = temp.GetComponent<PopupStack>();
-            tempStack?.onClose?.Invoke();
-
-            RemoveDicData(temp);
-            if (ob == temp) break;
-        }
+        var popup = ob.GetComponent<PopupStack>();
+        popup.onClose?.Invoke();
+        RemoveDicData(ob);
     }
     static public bool IsEmpty()
     {
-        return popupStack.Count == 0;
+        return popupList.Count == 0;
     }
     #endregion
 }

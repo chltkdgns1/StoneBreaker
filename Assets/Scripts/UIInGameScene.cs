@@ -34,4 +34,13 @@ public class UIInGameScene : MonoBehaviour
     {
         handler.OnAddPick(cnt);
     }
+
+    public void OnForcePopup()
+    {
+        var popup = PopupStack.CheckShowPopup<PopupForcePick>("DirectLink/Prefabs/PopupPickForce");
+        if(popup != null)
+            popup.SetData();
+        else
+            PopupStack.PopupShow<PopupForcePick>("DirectLink/Prefabs/PopupPickForce");
+    }
 }

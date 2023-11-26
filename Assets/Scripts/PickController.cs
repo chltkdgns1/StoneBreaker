@@ -5,7 +5,9 @@ using UnityEngine;
 [System.Serializable]
 public class PickInfo
 {
-    public AttackInfo attackInfo;
+    public float speed;             // 스피드
+    public int forceCount;          // 강화 횟수
+    public AttackInfo attackInfo;   // 공격력 정보
 }
 
 public class PickController : MonoBehaviour, 
